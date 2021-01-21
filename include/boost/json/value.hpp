@@ -35,6 +35,10 @@ BOOST_JSON_NS_BEGIN
 
 //----------------------------------------------------------
 
+class pointer;
+
+//----------------------------------------------------------
+
 /** The type used to represent any JSON value
 
     This is a
@@ -3188,6 +3192,30 @@ public:
     {
         return as_array().at(pos);
     }
+
+    /** Access a child element, with bounds checking.
+      */
+    BOOST_JSON_DECL
+    value const&
+    at(pointer ptr) const;
+
+    /** Access a child element, with bounds checking.
+      */
+    BOOST_JSON_DECL
+    value&
+    at(pointer ptr);
+
+    /** Access a child element, with bounds checking.
+      */
+    BOOST_JSON_DECL
+    value const*
+    find(pointer ptr, error_code& ec) const noexcept;
+
+    /** Access a child element, with bounds checking.
+      */
+    BOOST_JSON_DECL
+    value*
+    find(pointer ptr, error_code& ec) noexcept;
 
     /** Return `true` if two values are equal.
 
