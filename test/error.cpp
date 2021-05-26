@@ -67,7 +67,6 @@ public:
 
         check(condition::pointer_parse_error, error::missing_slash);
         check(condition::pointer_parse_error, error::invalid_escape);
-        check(condition::pointer_parse_error, error::token_too_large);
 
         check(condition::pointer_use_error, error::token_not_number);
         check(condition::pointer_use_error, error::value_is_scalar);

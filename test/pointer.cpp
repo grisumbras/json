@@ -159,12 +159,7 @@ public:
         jv.find(pointer("/x/y/z"), ec);
         BOOST_TEST(ec == error::value_is_scalar);
 
-        string s("/");
-        std::generate_n(std::back_inserter(s), 257, []{ return ' '; });
-        jv.find(pointer(s), ec);
-        BOOST_TEST(ec == error::token_too_large);
-
-        s = "/foo/";
+        string s = "/foo/";
         s += std::to_string((std::numeric_limits<std::size_t>::max)());
         if ( '9' == s[s.size() - 1] )
         {

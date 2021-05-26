@@ -52,7 +52,6 @@ case error::test_failure: return "test failure";
 
             case error::missing_slash: return "missing slash character";
             case error::invalid_escape: return "invalid escape sequence";
-            case error::token_too_large: return "token reference too large";
             case error::token_not_number: return "token is not a number";
             case error::value_is_scalar: return "current value is scalar";
             case error::not_found: return "no referenced value";
@@ -91,7 +90,6 @@ case error::not_exact:
 
             case error::missing_slash:
             case error::invalid_escape:
-            case error::token_too_large:
                 return condition::pointer_parse_error;
 
             case error::token_not_number:

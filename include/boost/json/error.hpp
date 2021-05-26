@@ -224,9 +224,6 @@ enum class error
     /// invalid escape sequence
     invalid_escape,
 
-    /// reference token is too large
-    token_too_large,
-
     /// token should be a number but cannot be parsed as such
     token_not_number,
 

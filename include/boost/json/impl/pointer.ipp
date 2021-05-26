@@ -16,6 +16,114 @@ BOOST_JSON_NS_BEGIN
 
 namespace detail {
 
+
+class pointer_token
+{
+public:
+    class iterator;
+
+    pointer_token(
+        string_view::const_iterator b,
+        string_view::const_iterator e) noexcept
+        : b_(b), e_(e)
+    {
+    }
+
+    iterator begin() const noexcept;
+    iterator end() const noexcept;
+
+private:
+    string_view::const_iterator b_;
+    string_view::const_iterator e_;
+};
+
+class pointer_token::iterator
+{
+public:
+    explicit iterator(string_view::const_iterator base) noexcept
+        : base_(base)
+    {
+    }
+
+    char operator*() const noexcept
+    {
+        switch (char c = *base_)
+        {
+        case '~':
+            c = base_[1];
+            if ( '0' == c )
+            {
+                return '~';
+            }
+            else
+            {
+                BOOST_ASSERT('1' == c);
+                return '/';
+            }
+        default:
+            return c;
+        }
+    }
+
+    iterator& operator++() noexcept
+    {
+        if ( '~' == *base_ )
+        {
+            base_ += 2;
+        }
+        else
+        {
+            ++base_;
+        }
+        return *this;
+    }
+
+    string_view::const_iterator base() const noexcept
+    {
+        return base_;
+    }
+
+private:
+    string_view::const_iterator base_;
+};
+
+bool operator==(pointer_token::iterator l, pointer_token::iterator r) noexcept
+{
+    return l.base() == r.base();
+}
+
+bool operator!=(pointer_token::iterator l, pointer_token::iterator r) noexcept
+{
+    return l.base() != r.base();
+}
+
+pointer_token::iterator pointer_token::begin() const noexcept
+{
+    return iterator(b_);
+}
+
+pointer_token::iterator pointer_token::end() const noexcept
+{
+    return iterator(e_);
+}
+
+bool operator==(pointer_token token, string_view sv) noexcept
+{
+    auto t_b = token.begin();
+    auto const t_e = token.end();
+    auto s_b = sv.begin();
+    auto const s_e = sv.end();
+    for (; t_b != t_e && s_b != s_e; ++t_b, ++s_b)
+    {
+        if (*t_b != *s_b)
+        {
+            return false;
+        }
+    }
+
+    return t_e == t_b && s_e == s_b;
+}
+
 std::size_t
 parse_number_token(
     string_view::const_iterator& b,
@@ -65,17 +173,13 @@ parse_number_token(
     return result;
 }
 
-
-string_view
-parse_string_token(
-    string_view::const_iterator& b,
+pointer_token
+get_token(
+    string_view::const_iterator b,
     string_view::const_iterator e,
-    char* out,
-    char const* out_end,
     error_code& ec) noexcept
 {
-    char* const start = out;
-
+    auto const start = b;
     for (; b < e; ++b)
     {
         char const c = *b;
@@ -84,41 +188,46 @@ parse_string_token(
             break;
         }
 
-        if ( out == out_end )
-        {
-            ec = error::token_too_large;
-            goto parse_done;
-        }
-
         if ( '~' == c )
         {
             if ( ++b == e )
             {
                 ec = error::invalid_escape;
-                goto parse_done;
+                break;
             }
 
             switch (*b)
             {
-            case '0':
-                *out++ = '~';
-                break;
+            case '0': // fall through
             case '1':
-                *out++ = '/';
-                break;
+                // valid escape sequence
+                continue;
             default:
                 ec = error::invalid_escape;
-                goto parse_done;
+                break;
             }
-        }
-        else
-        {
-            *out++ = c;
+            break;
         }
     }
 
-parse_done:
-    return string_view(start, out - start);
+    return pointer_token(start, b);
+}
+
+value*
+if_contains_token(object const& obj, pointer_token token)
+{
+    if(obj.empty())
+    {
+        return nullptr;
+    }
+
+    auto const it = detail::find_in_object(obj, token).first;
+    if(!it)
+    {
+        return nullptr;
+    }
+
+    return &it->value();
 }
 
 template <class Value>
@@ -139,15 +248,14 @@ find_pointer(Value& root, pointer ptr, error_code& ec) noexcept
 
         if ( auto object = result->if_object() )
         {
-            char buffer[256];
-            string_view token = detail::parse_string_token(cur, ptr_str.end(),
-                buffer, buffer + sizeof(buffer), ec);
+            auto const token = get_token(cur, ptr_str.end(), ec);
             if ( ec )
             {
                 return nullptr;
             }
 
-            result = object->if_contains(token);
+            result = detail::if_contains_token(*object, token);
+            cur = token.end().base();
         }
         else if ( auto array = result->if_array() )
         {
@@ -172,6 +280,8 @@ find_pointer(Value& root, pointer ptr, error_code& ec) noexcept
             return nullptr;
         }
     }
+
+    BOOST_ASSERT(result);
     return result;
 }
 
