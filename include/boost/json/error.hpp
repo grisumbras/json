@@ -235,6 +235,9 @@ enum class error
 
     /// token cannot be represented by std::size_t
     token_overflow,
+
+    /// past-the-end index is not supported
+    past_the_end,
 };
 
 /** Error conditions corresponding to JSON errors

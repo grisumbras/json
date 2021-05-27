@@ -132,6 +132,19 @@ bool is_invalid_zero(
     return *b != '/';
 }
 
+bool is_past_the_end_token(
+    char const* b,
+    char const* e) noexcept
+{
+    if ( *b != '-' )
+        return false;
+
+    ++b;
+    if ( b == e )
+        return true;
+    return *b == '/';
+}
+
 std::size_t
 parse_number_token(
     char const*& b,
@@ -142,6 +155,12 @@ parse_number_token(
         || is_invalid_zero(b, e) )
     {
         ec = error::token_not_number;
+        return {};
+    }
+
+    if ( is_past_the_end_token(b, e) )
+    {
+        ec = error::past_the_end;
         return {};
     }
 

@@ -56,6 +56,7 @@ case error::token_not_number: return "token is not a number";
 case error::value_is_scalar: return "current value is scalar";
 case error::not_found: return "no referenced value";
 case error::token_overflow: return "token overflow";
+case error::past_the_end: return "past-the-end token not supported";
             }
         }
 
@@ -96,6 +97,7 @@ case error::token_not_number:
 case error::value_is_scalar:
 case error::not_found:
 case error::token_overflow:
+case error::past_the_end:
     return condition::pointer_use_error;
             }
         }

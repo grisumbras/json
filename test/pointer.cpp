@@ -162,6 +162,15 @@ public:
         jv.find(pointer("/foo/2."), ec);
         BOOST_TEST(ec == error::token_not_number);
 
+        jv.find(pointer("/foo/-"), ec);
+        BOOST_TEST(ec == error::past_the_end);
+
+        jv.find(pointer("/foo/-/x"), ec);
+        BOOST_TEST(ec == error::past_the_end);
+
+        jv.find(pointer("/foo/-1"), ec);
+        BOOST_TEST(ec == error::token_not_number);
+
         jv.find(pointer("/x/y/z"), ec);
         BOOST_TEST(ec == error::value_is_scalar);
 

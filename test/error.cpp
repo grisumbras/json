@@ -72,6 +72,7 @@ public:
         check(condition::pointer_use_error, error::value_is_scalar);
         check(condition::pointer_use_error, error::not_found);
         check(condition::pointer_use_error, error::token_overflow);
+        check(condition::pointer_use_error, error::past_the_end);
 
         check(error::test_failure);
     }
