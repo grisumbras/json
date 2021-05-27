@@ -16,7 +16,6 @@ BOOST_JSON_NS_BEGIN
 
 namespace detail {
 
-
 class pointer_token
 {
 public:
@@ -25,7 +24,8 @@ public:
     pointer_token(
         string_view::const_iterator b,
         string_view::const_iterator e) noexcept
-        : b_(b), e_(e)
+        : b_(b)
+        , e_(e)
     {
     }
 
@@ -52,14 +52,9 @@ public:
         case '~':
             c = base_[1];
             if ( '0' == c )
-            {
                 return '~';
-            }
-            else
-            {
-                BOOST_ASSERT('1' == c);
-                return '/';
-            }
+            BOOST_ASSERT('1' == c);
+            return '/';
         default:
             return c;
         }
@@ -68,13 +63,9 @@ public:
     iterator& operator++() noexcept
     {
         if ( '~' == *base_ )
-        {
             base_ += 2;
-        }
         else
-        {
             ++base_;
-        }
         return *this;
     }
 
@@ -142,9 +133,7 @@ parse_number_token(
         char const c = *b;
 
         if ( '/' == c)
-        {
             break;
-        }
 
         if ( c < '0' || c > '9' )
         {
@@ -184,9 +173,7 @@ get_token(
     {
         char const c = *b;
         if ( '/' == c )
-        {
             break;
-        }
 
         if ( '~' == c )
         {
@@ -217,15 +204,11 @@ value*
 if_contains_token(object const& obj, pointer_token token)
 {
     if(obj.empty())
-    {
         return nullptr;
-    }
 
     auto const it = detail::find_in_object(obj, token).first;
     if(!it)
-    {
         return nullptr;
-    }
 
     return &it->value();
 }
@@ -235,10 +218,12 @@ Value*
 find_pointer(Value& root, pointer ptr, error_code& ec) noexcept
 {
     ec.clear();
-    string_view const ptr_str = ptr.string();
+
     Value* result = &root;
+    string_view const ptr_str = ptr.string();
     auto cur = ptr_str.begin();
-    while ( ptr_str.end() != cur )
+    auto const end = ptr_str.end();
+    while ( end != cur )
     {
         if ( *cur++ != '/' )
         {
@@ -246,27 +231,22 @@ find_pointer(Value& root, pointer ptr, error_code& ec) noexcept
             return nullptr;
         }
 
-        if ( auto object = result->if_object() )
+        if ( auto const po = result->if_object() )
         {
-            auto const token = get_token(cur, ptr_str.end(), ec);
+            auto const token = get_token(cur, end, ec);
             if ( ec )
-            {
                 return nullptr;
-            }
 
-            result = detail::if_contains_token(*object, token);
+            result = detail::if_contains_token(*po, token);
             cur = token.end().base();
         }
-        else if ( auto array = result->if_array() )
+        else if ( auto const pa = result->if_array() )
         {
-            std::size_t index = detail::parse_number_token(cur, ptr_str.end(),
-                    ec);
+            auto const index = detail::parse_number_token(cur, end, ec);
             if ( ec )
-            {
                 return nullptr;
-            }
 
-            result = array->if_contains(index);
+            result = pa->if_contains(index);
         }
         else
         {
@@ -292,9 +272,7 @@ at_pointer(Value& root, pointer ptr)
     error_code ec;
     auto const found = find_pointer(root, ptr, ec);
     if ( !found )
-    {
         detail::throw_system_error(ec, BOOST_JSON_SOURCE_POS);
-    }
     return *found;
 }
 

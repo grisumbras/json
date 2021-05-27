@@ -50,12 +50,12 @@ case error::not_exact: return "not exact";
 
 case error::test_failure: return "test failure";
 
-            case error::missing_slash: return "missing slash character";
-            case error::invalid_escape: return "invalid escape sequence";
-            case error::token_not_number: return "token is not a number";
-            case error::value_is_scalar: return "current value is scalar";
-            case error::not_found: return "no referenced value";
-            case error::token_overflow: return "token overflow";
+case error::missing_slash: return "missing slash character";
+case error::invalid_escape: return "invalid escape sequence";
+case error::token_not_number: return "token is not a number";
+case error::value_is_scalar: return "current value is scalar";
+case error::not_found: return "no referenced value";
+case error::token_overflow: return "token overflow";
             }
         }
 
@@ -88,15 +88,15 @@ case error::not_number:
 case error::not_exact:
     return condition::assign_error;
 
-            case error::missing_slash:
-            case error::invalid_escape:
-                return condition::pointer_parse_error;
+case error::missing_slash:
+case error::invalid_escape:
+    return condition::pointer_parse_error;
 
-            case error::token_not_number:
-            case error::value_is_scalar:
-            case error::not_found:
-            case error::token_overflow:
-                return condition::pointer_use_error;
+case error::token_not_number:
+case error::value_is_scalar:
+case error::not_found:
+case error::token_overflow:
+    return condition::pointer_use_error;
             }
         }
     };

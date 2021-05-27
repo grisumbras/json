@@ -26,13 +26,15 @@ public:
     */
     pointer() noexcept
         : pointer("")
-    {}
+    {
+    }
 
     /** String constructor
     */
     explicit pointer(string_view s) noexcept
         : str_(s)
-    {}
+    {
+    }
 
     string_view
     string() const noexcept

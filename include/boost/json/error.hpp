@@ -215,7 +215,7 @@ enum class error
     test_failure,
 
     //
-    // pointer errors
+    // JSON Pointer errors
     //
 
     /// missing slash character before token reference
