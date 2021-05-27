@@ -22,8 +22,8 @@ public:
     class iterator;
 
     pointer_token(
-        string_view::const_iterator b,
-        string_view::const_iterator e) noexcept
+        char const* b,
+        char const* e) noexcept
         : b_(b)
         , e_(e)
     {
@@ -33,14 +33,14 @@ public:
     iterator end() const noexcept;
 
 private:
-    string_view::const_iterator b_;
-    string_view::const_iterator e_;
+    char const* b_;
+    char const* e_;
 };
 
 class pointer_token::iterator
 {
 public:
-    explicit iterator(string_view::const_iterator base) noexcept
+    explicit iterator(char const* base) noexcept
         : base_(base)
     {
     }
@@ -69,13 +69,13 @@ public:
         return *this;
     }
 
-    string_view::const_iterator base() const noexcept
+    char const* base() const noexcept
     {
         return base_;
     }
 
 private:
-    string_view::const_iterator base_;
+    char const* base_;
 };
 
 bool operator==(pointer_token::iterator l, pointer_token::iterator r) noexcept
@@ -117,8 +117,8 @@ bool operator==(pointer_token token, string_view sv) noexcept
 }
 
 bool is_invalid_zero(
-    string_view::const_iterator b,
-    string_view::const_iterator e) noexcept
+    char const* b,
+    char const* e) noexcept
 {
     // in JSON Pointer only zero index can start character '0'
     if ( *b != '0' )
@@ -134,8 +134,8 @@ bool is_invalid_zero(
 
 std::size_t
 parse_number_token(
-    string_view::const_iterator& b,
-    string_view::const_iterator e,
+    char const*& b,
+    char const* e,
     error_code& ec) noexcept
 {
     if ( ( b == e )
@@ -175,11 +175,11 @@ parse_number_token(
 
 pointer_token
 get_token(
-    string_view::const_iterator b,
-    string_view::const_iterator e,
+    char const* b,
+    char const* e,
     error_code& ec) noexcept
 {
-    auto const start = b;
+    char const* start = b;
     for (; b < e; ++b)
     {
         char const c = *b;
@@ -232,8 +232,8 @@ find_pointer(Value& root, pointer ptr, error_code& ec) noexcept
 
     Value* result = &root;
     string_view const ptr_str = ptr.string();
-    auto cur = ptr_str.begin();
-    auto const end = ptr_str.end();
+    char const* cur = ptr_str.data();
+    char const* const end = cur + ptr_str.size();
     while ( end != cur )
     {
         if ( *cur++ != '/' )
