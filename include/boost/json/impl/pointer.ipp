@@ -104,15 +104,32 @@ bool operator==(pointer_token token, string_view sv) noexcept
     auto const t_e = token.end();
     auto s_b = sv.begin();
     auto const s_e = sv.end();
-    for (; t_b != t_e && s_b != s_e; ++t_b, ++s_b)
+    while (s_b != s_e)
     {
-        if (*t_b != *s_b)
-        {
+        if (t_e == t_b)
             return false;
-        }
+        if (*t_b != *s_b)
+            return false;
+        ++t_b;
+        ++s_b;
     }
+    return t_b == t_e;
+}
 
-    return t_e == t_b && s_e == s_b;
+bool is_invalid_zero(
+    string_view::const_iterator b,
+    string_view::const_iterator e) noexcept
+{
+    // in JSON Pointer only zero index can start character '0'
+    if ( *b != '0' )
+        return false;
+
+    // if an index token starts with '0', then it should not have any more
+    // characters: either the string should end, or new token should start
+    ++b;
+    if ( b == e )
+        return false;
+    return *b != '/';
 }
 
 std::size_t
@@ -121,7 +138,8 @@ parse_number_token(
     string_view::const_iterator e,
     error_code& ec) noexcept
 {
-    if ( ( b == e ) || ( *b == '0' && ( b + 1 ) != e  && b[1] != '/' ) )
+    if ( ( b == e )
+        || is_invalid_zero(b, e) )
     {
         ec = error::token_not_number;
         return {};
@@ -135,29 +153,22 @@ parse_number_token(
         if ( '/' == c)
             break;
 
-        if ( c < '0' || c > '9' )
+        unsigned d = c - '0';
+        if ( d > 9 )
         {
             ec = error::token_not_number;
             return {};
         }
 
-        constexpr std::size_t max_size =
-            (std::numeric_limits<std::size_t>::max)();
-        constexpr std::size_t max_div10 = max_size / 10;
-
-        if ( result <= max_div10 )
+        std::size_t new_result = result * 10 + d;
+        if ( new_result < result )
         {
-            result *= 10;
-            std::size_t d = c - '0';
-            if ( result <= max_size - d )
-            {
-                result += d;
-                continue;
-            }
+            ec = error::token_overflow;
+            return {};
         }
 
-        ec = error::token_overflow;
-        return {};
+        result = new_result;
+
     }
     return result;
 }

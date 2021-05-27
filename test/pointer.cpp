@@ -138,6 +138,9 @@ public:
         jv.find(pointer("/foo/25"), ec);
         BOOST_TEST(ec == error::not_found);
 
+        value(object()).find(pointer("/foo"), ec);
+        BOOST_TEST(ec == error::not_found);
+
         jv.find(pointer("/m~"), ec);
         BOOST_TEST(ec == error::invalid_escape);
 
@@ -154,6 +157,9 @@ public:
         BOOST_TEST(ec == error::token_not_number);
 
         jv.find(pointer("/foo/2b"), ec);
+        BOOST_TEST(ec == error::token_not_number);
+
+        jv.find(pointer("/foo/2."), ec);
         BOOST_TEST(ec == error::token_not_number);
 
         jv.find(pointer("/x/y/z"), ec);
