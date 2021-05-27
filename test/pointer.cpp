@@ -37,6 +37,17 @@ class pointer_test
         };
     }
 
+    value
+    bigObject() const
+    {
+        object result;
+        for (int i = 0; i < 50; ++i)
+        {
+            result.emplace(std::to_string(i), i);
+        }
+        return result;
+    }
+
 public:
     void
     testRootPointer()
@@ -139,6 +150,9 @@ public:
         BOOST_TEST(ec == error::not_found);
 
         value(object()).find(pointer("/foo"), ec);
+        BOOST_TEST(ec == error::not_found);
+
+        bigObject().find(pointer("/foo"), ec);
         BOOST_TEST(ec == error::not_found);
 
         jv.find(pointer("/m~"), ec);
