@@ -10,6 +10,7 @@
 source_group("" FILES
     file.hpp
     parse_into.cpp
+    parse_into_canada.cpp
     path.cpp
     pretty.cpp
     proxy.cpp
@@ -20,6 +21,12 @@ source_group("" FILES
 
 add_executable(parse_into
     parse_into.cpp
+)
+set_property(TARGET parse_into PROPERTY FOLDER "example")
+target_link_libraries(parse_into PRIVATE Boost::json)
+
+add_executable(parse_into_canada
+    parse_into_canada.cpp
 )
 set_property(TARGET parse_into PROPERTY FOLDER "example")
 target_link_libraries(parse_into PRIVATE Boost::json)
