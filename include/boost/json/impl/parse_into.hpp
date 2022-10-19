@@ -13,8 +13,7 @@
 
 #ifndef BOOST_JSON_NO_PARSE_INTO
 
-#include <boost/json/detail/config.hpp>
-#include <boost/json/detail/parse_into.hpp>
+#include <boost/json/basic_parser_impl.hpp>
 #include <boost/json/error.hpp>
 
 namespace boost {
