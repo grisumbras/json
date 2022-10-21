@@ -145,6 +145,8 @@ struct array_conversion_tag : native_conversion_tag { };
 struct string_conversion_tag : native_conversion_tag { };
 struct bool_conversion_tag : native_conversion_tag { };
 struct number_conversion_tag : native_conversion_tag { };
+struct integral_conversion_tag : number_conversion_tag { };
+struct floating_point_conversion_tag : number_conversion_tag { };
 struct null_like_conversion_tag { };
 struct string_like_conversion_tag { };
 struct map_like_conversion_tag { };
@@ -216,31 +218,45 @@ template< class T >
 using described_bases = describe::describe_bases<
     T, describe::mod_any_access>;
 
+template< class T >
+using basic_conversion_tag = mp11::mp_list<
+    // native conversions (constructors and member functions of value)
+    std::is_same<T, value>,            value_conversion_tag,
+    std::is_same<T, array>,            array_conversion_tag,
+    std::is_same<T, object>,           object_conversion_tag,
+    std::is_same<T, string>,           string_conversion_tag,
+    std::is_same<T, bool>,             bool_conversion_tag,
+    std::is_integral<T>,               integral_conversion_tag,
+    std::is_floating_point<T>,         floating_point_conversion_tag,
+    // generic conversions
+    is_null_like<T>,                   null_like_conversion_tag,
+    is_string_like<T>,                 string_like_conversion_tag,
+    is_map_like<T>,                    map_like_conversion_tag,
+    is_sequence_like<T>,               sequence_conversion_tag,
+    is_tuple_like<T>,                  tuple_conversion_tag,
+    is_described_class<T>,             described_class_conversion_tag,
+    is_described_enum<T>,              described_enum_conversion_tag,
+    // failed to find a suitable implementation
+    mp11::mp_true,                     no_conversion_tag>;
+
+template< class Ctx, class T, class Dir >
+using conversion_tag = mp11::mp_append<
+    // user conversion (via tag_invoke)
+    mp11::mp_list<
+        has_user_conversion3<Ctx, T, Dir>, full_context_conversion_tag,
+        has_user_conversion2<Ctx, T, Dir>, context_conversion_tag,
+        has_user_conversion1<T, Dir>,      user_conversion_tag>,
+    // other conversions
+    basic_conversion_tag<T>>;
+
+template<template <class...> class F, class... Args>
+using select_conversion_implementation = mp11::mp_rename<
+    F<Args...>, mp11::mp_cond>;
+
 template< class Ctx, class T, class Dir >
 struct conversion_category_impl
 {
-    using type = mp11::mp_cond<
-        // user conversion (via tag_invoke)
-        has_user_conversion3<Ctx, T, Dir>, full_context_conversion_tag,
-        has_user_conversion2<Ctx, T, Dir>, context_conversion_tag,
-        has_user_conversion1<T, Dir>,      user_conversion_tag,
-        // native conversions (constructors and member functions of value)
-        std::is_same<T, value>,            value_conversion_tag,
-        std::is_same<T, array>,            array_conversion_tag,
-        std::is_same<T, object>,           object_conversion_tag,
-        std::is_same<T, string>,           string_conversion_tag,
-        std::is_same<T, bool>,             bool_conversion_tag,
-        std::is_arithmetic<T>,             number_conversion_tag,
-        // generic conversions
-        is_null_like<T>,                   null_like_conversion_tag,
-        is_string_like<T>,                 string_like_conversion_tag,
-        is_map_like<T>,                    map_like_conversion_tag,
-        is_sequence_like<T>,               sequence_conversion_tag,
-        is_tuple_like<T>,                  tuple_conversion_tag,
-        is_described_class<T>,             described_class_conversion_tag,
-        is_described_enum<T>,              described_enum_conversion_tag,
-        // failed to find a suitable implementation
-        mp11::mp_true,                     no_conversion_tag>;
+    using type = select_conversion_implementation<conversion_tag, Ctx, T, Dir>;
 };
 template< class Ctx, class T, class Dir >
 using conversion_category =
