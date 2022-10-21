@@ -275,6 +275,10 @@
 # define BOOST_JSON_CONSTINIT
 #endif
 
+#if (__cplusplus < 201400) and ! defined(BOOST_JSON_NO_PARSE_INTO)
+# define BOOST_JSON_NO_PARSE_INTO
+#endif
+
 namespace boost {
 namespace json {
 namespace detail {
