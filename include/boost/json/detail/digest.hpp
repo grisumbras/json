@@ -41,23 +41,23 @@ digest(
     std::size_t n = std::distance(b, e);
     std::size_t const m = n % step;
 
-    char temp[step];
+    std::array<unsigned char, step> temp;
     hash_t batch;
     while( n > m )
     {
-        std::copy_n(b, step, temp);
+        std::copy_n(b, step, temp.data());
 
-        std::memcpy(&batch, temp, step);
+        std::memcpy(&batch, temp.data(), step);
         hash = (batch ^ hash) * prime;
 
         std::advance(b, step);
         n -= step;
     }
 
-    std::memset(temp, 0, step);
-    std::copy_n(b, n, temp);
+    temp.fill(0);
+    std::copy_n(b, n, temp.data());
 
-    std::memcpy(&batch, temp, step);
+    std::memcpy(&batch, temp.data(), step);
     hash = (batch ^ hash) * prime;
 
     return hash;
