@@ -89,6 +89,7 @@ function(boost_json_setup_properties target)
     target_link_libraries(${target}
         PUBLIC
             Boost::assert
+            Boost::charconv
             Boost::config
             Boost::container
             Boost::container_hash

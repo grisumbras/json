@@ -11,7 +11,7 @@
 #ifndef BOOST_JSON_DETAIL_IMPL_FORMAT_IPP
 #define BOOST_JSON_DETAIL_IMPL_FORMAT_IPP
 
-#include <boost/json/detail/ryu/ryu.hpp>
+#include <cmath>
 #include <cstring>
 
 namespace boost {
@@ -108,14 +108,6 @@ format_int64(
     *dest++ = '-';
     ui = ~ui + 1;
     return 1 + format_uint64(dest, ui);
-}
-
-unsigned
-format_double(
-    char* dest, double d, bool allow_infinity_and_nan) noexcept
-{
-    return static_cast<int>(
-        ryu::d2s_buffered_n(d, dest, allow_infinity_and_nan));
 }
 
 } // detail

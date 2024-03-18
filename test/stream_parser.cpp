@@ -347,11 +347,8 @@ public:
     check_round_trip(value const& jv1,
         const parse_options& po = parse_options())
     {
-        auto const s2 =
-            //to_string_test(jv1); // use this if serializer is broken
-            serialize(jv1);
-        auto jv2 =
-            from_string_test(s2, {}, po);
+        auto const s2 = serialize(jv1);
+        auto jv2 = from_string_test(s2, {}, po);
         BOOST_TEST(equal(jv1, jv2));
     }
 

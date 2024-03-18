@@ -10,6 +10,7 @@
 #ifndef BOOST_JSON_IMPL_SERIALIZER_IPP
 #define BOOST_JSON_IMPL_SERIALIZER_IPP
 
+#include <boost/charconv/to_chars.hpp>
 #include <boost/core/detail/static_assert.hpp>
 #include <boost/json/serializer.hpp>
 #include <boost/json/detail/format.hpp>
@@ -19,6 +20,59 @@
 #pragma warning(push)
 #pragma warning(disable: 4127) // conditional expression is constant
 #endif
+
+namespace {
+
+std::size_t
+BOOST_NOINLINE
+format_special(char* dest, double d, bool allow_infinity_and_nan) noexcept
+{
+    if( std::isinf(d) )
+    {
+        if( std::signbit(d) )
+        {
+            if( allow_infinity_and_nan )
+            {
+                std::memcpy(dest, "-Infinity", 9);
+                return 9;
+            }
+            else
+            {
+                std::memcpy(dest, "-1e99999", 8);
+                return 8;
+            }
+        }
+        else
+        {
+            if( allow_infinity_and_nan )
+            {
+                std::memcpy(dest, "Infinity", 8);
+                return 8;
+            }
+            else
+            {
+                std::memcpy(dest, "1e99999", 7);
+                return 7;
+            }
+        }
+    }
+    else
+    {
+        BOOST_ASSERT( std::isnan(d) );
+        if( allow_infinity_and_nan )
+        {
+            std::memcpy(dest, "NaN", 3);
+            return 3;
+        }
+        else
+        {
+            std::memcpy(dest, "null", 4);
+            return 4;
+        }
+    }
+}
+
+} // namespace
 
 namespace boost {
 namespace json {
@@ -54,7 +108,18 @@ struct double_formatter
     std::size_t
     operator()(char* dst) const noexcept
     {
-        return format_double(dst, d, allow_infinity_and_nan);
+        if(BOOST_JSON_UNLIKELY( !std::isfinite(d)) )
+        {
+            return format_special(dst, d, allow_infinity_and_nan);
+        }
+
+        auto const result = boost::charconv::to_chars(
+            dst,
+            dst + detail::max_number_chars,
+            d,
+            boost::charconv::chars_format::scientific);
+        BOOST_ASSERT( result.ec == std::errc() );
+        return result.ptr - dst;
     }
 };
 
