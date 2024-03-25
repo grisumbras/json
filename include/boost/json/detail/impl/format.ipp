@@ -58,7 +58,7 @@ inline void format_digit( char * dest, unsigned v )
     *dest = static_cast<char>( v + '0' );
 }
 
-unsigned
+std::size_t
 format_uint64(
     char* dest,
     std::uint64_t v) noexcept
@@ -93,13 +93,13 @@ format_uint64(
         format_digit( p, static_cast<unsigned>(v) );
     }
 
-    unsigned const n = static_cast<unsigned>( buffer + 24 - p );
+    std::size_t const n = static_cast<std::size_t>( buffer + 24 - p );
     std::memcpy( dest, p, n );
 
     return n;
 }
 
-unsigned
+std::size_t
 format_int64(
     char* dest, int64_t i) noexcept
 {
@@ -112,7 +112,7 @@ format_int64(
     return 1 + format_uint64(dest, ui);
 }
 
-unsigned
+std::size_t
 format_double(
     char* dest, double d, bool allow_infinity_and_nan) noexcept
 {
