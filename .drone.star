@@ -401,9 +401,32 @@ def apply_special(job, special):
 
 _supported_compilers = {
     'gcc': {
-        'versions': ['14', '13', '12', '11', '10', '9', '8.3', '8', '7', '6', '5', '4.9', '4.8'],
+        'versions': [
+            '16', '15', '14', '13', '12', '11', '10', '9', '8.3', '8', '7',
+            '6', '5', '4.9', '4.8'
+        ],
         'display_name': 'GCC',
         'executable': 'g++',
+        '16': {
+            'latest_cpp': 2026,
+            'platforms': {
+                ('linux', 'x86_64'): {
+                    'image': 'cppalliance/droneubuntu2604:1',
+                    'packages': ['g++-16', 'binutils-gold'],
+                    'environment': {'UBUNTU_TOOLCHAIN_DISABLE': 'true'},
+                }
+            },
+        },
+        '15': {
+            'latest_cpp': 2026,
+            'platforms': {
+                ('linux', 'x86_64'): {
+                    'image': 'cppalliance/droneubuntu2604:1',
+                    'packages': ['g++-15', 'binutils-gold'],
+                    'environment': {'UBUNTU_TOOLCHAIN_DISABLE': 'true'},
+                }
+            },
+        },
         '14': {
             'latest_cpp': 2026,
             'platforms': {
