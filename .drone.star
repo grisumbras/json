@@ -7,9 +7,14 @@
 
 
 def main(ctx):
-    globalenv={'B2_CI_VERSION': '1', 'B2_FLAGS': 'warnings=extra warnings-as-errors=on', 'DEPINST': '--reject-cycles'}
-    with_stdxxfs = { 'B2_LINKFLAGS': '-lstdc++fs', }
-    cmake_env = { 'CMAKE_VERSION': '3.8.2'}
+    globalenv={
+        'B2_CI_VERSION': '1',
+        'B2_FLAGS': 'warnings=extra warnings-as-errors=on',
+        'DEPINST': '--reject-cycles',
+        'UBUNTU_TOOLCHAIN_DISABLE': 'true',
+    }
+    with_stdxxfs = {'B2_LINKFLAGS': '-lstdc++fs', }
+    cmake_env = {'CMAKE_VERSION': '3.8.2'}
 
     return generate(
         ['gcc >=4.9', 'clang >=3.8', 'msvc >=14.0', 'apple-clang >=13.4'],
@@ -40,18 +45,18 @@ def main(ctx):
             },
         ],
         extras=[
-            { 'match': {'compiler': 'gcc =9', 'os': 'linux'},
-              'name': 'GCC 9 CMake superproject',
+            { 'match': {'compiler': 'gcc =8', 'os': 'linux'},
+              'name': 'GCC 8 CMake superproject',
               'type': 'cmake-superproject',
               'environment': cmake_env,
             },
-            { 'match': {'compiler': 'gcc =9', 'os': 'linux'},
-              'name': 'GCC 9 CMake main project',
+            { 'match': {'compiler': 'gcc =8', 'os': 'linux'},
+              'name': 'GCC 8 CMake main project',
               'type': 'cmake-mainproject',
               'environment': cmake_env,
             },
-            { 'match': {'compiler': 'gcc =9', 'os': 'linux'},
-              'name': 'GCC 9 CMake subdirectory',
+            { 'match': {'compiler': 'gcc =8', 'os': 'linux'},
+              'name': 'GCC 8 CMake subdirectory',
               'type': 'cmake-subdirectory',
               'environment': cmake_env,
             },
@@ -415,7 +420,6 @@ _supported_compilers = {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu2604:1',
                     'packages': ['g++-16', 'binutils-gold'],
-                    'environment': {'UBUNTU_TOOLCHAIN_DISABLE': 'true'},
                 }
             },
         },
@@ -425,7 +429,6 @@ _supported_compilers = {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu2604:1',
                     'packages': ['g++-15', 'binutils-gold'],
-                    'environment': {'UBUNTU_TOOLCHAIN_DISABLE': 'true'},
                 }
             },
         },
@@ -471,7 +474,7 @@ _supported_compilers = {
             'custom_cpp': { 2026: '2b' },
             'platforms': {
                 ('linux', 'x86_64'): {
-                    'image': 'cppalliance/droneubuntu2004:1',
+                    'image': 'cppalliance/droneubuntu2204:1',
                     'packages': ['g++-11'],
                 },
                 ('freebsd', 'x86_64'): {
@@ -481,11 +484,11 @@ _supported_compilers = {
                     },
                 },
                 ('linux', 'arm64'): {
-                    'image': 'cppalliance/droneubuntu2004:multiarch',
+                    'image': 'cppalliance/droneubuntu2204:multiarch',
                     'packages': ['g++-11'],
                 },
                 ('linux', 's390x'): {
-                    'image': 'cppalliance/droneubuntu2004:multiarch',
+                    'image': 'cppalliance/droneubuntu2204:multiarch',
                     'packages': ['g++-11'],
                 },
             },
@@ -507,7 +510,7 @@ _supported_compilers = {
             'custom_cpp': { 2020: '2a' },
             'platforms': {
                 ('linux', 'x86_64'): {
-                    'image': 'cppalliance/droneubuntu1804:1',
+                    'image': 'cppalliance/droneubuntu2004:1',
                     'packages': ['g++-9'],
                 },
                 ('freebsd', 'x86_64'): {
@@ -563,7 +566,7 @@ _supported_compilers = {
             'latest_cpp': 2017,
             'platforms': {
                 ('linux', 'x86_64'): {
-                    'image': 'cppalliance/droneubuntu1804:1',
+                    'image': 'cppalliance/droneubuntu1604:1',
                     'packages': ['g++-5'],
                 },
             },
@@ -582,7 +585,7 @@ _supported_compilers = {
             'custom_cpp': { 2014: '1y' },
             'platforms': {
                 ('linux', 'x86_64'): {
-                    'image': 'cppalliance/droneubuntu1604:1',
+                    'image': 'cppalliance/droneubuntu1404:1',
                     'packages': ['g++-4.8'],
                 },
             },
@@ -617,10 +620,8 @@ _supported_compilers = {
             'latest_cpp':  2026,
             'platforms': {
                 ('linux', 'x86_64'): {
-                    'image': 'cppalliance/droneubuntu2404:1',
+                    'image': 'cppalliance/droneubuntu2604:1',
                     'packages': ['clang-21'],
-                    'llvm_os': 'noble',
-                    'llvm_ver': '21',
                 },
             },
         },
@@ -628,10 +629,8 @@ _supported_compilers = {
             'latest_cpp':  2026,
             'platforms': {
                 ('linux', 'x86_64'): {
-                    'image': 'cppalliance/droneubuntu2404:1',
+                    'image': 'cppalliance/droneubuntu2604:1',
                     'packages': ['clang-20'],
-                    'llvm_os': 'noble',
-                    'llvm_ver': '20',
                 },
             },
         },
@@ -641,8 +640,6 @@ _supported_compilers = {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu2404:1',
                     'packages': ['clang-19'],
-                    'llvm_os': 'noble',
-                    'llvm_ver': '19',
                 },
             },
         },
@@ -650,10 +647,8 @@ _supported_compilers = {
             'latest_cpp':  2026,
             'platforms': {
                 ('linux', 'x86_64'): {
-                    'image': 'cppalliance/droneubuntu2404:1',
+                    'image': 'cppalliance/droneubuntu2004:1',
                     'packages': ['clang-18'],
-                    'llvm_os': 'noble',
-                    'llvm_ver': '18',
                 },
             },
         },
@@ -663,8 +658,6 @@ _supported_compilers = {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu2404:1',
                     'packages': ['clang-17'],
-                    'llvm_os': 'noble',
-                    'llvm_ver': '17',
                 },
             },
         },
@@ -673,10 +666,8 @@ _supported_compilers = {
             'custom_cpp': { 2023: '2b' },
             'platforms': {
                 ('linux', 'x86_64'): {
-                    'image': 'cppalliance/droneubuntu2204:1',
+                    'image': 'cppalliance/droneubuntu2404:1',
                     'packages': ['clang-16'],
-                    'llvm_os': 'jammy',
-                    'llvm_ver': '16',
                 },
             },
         },
@@ -686,13 +677,9 @@ _supported_compilers = {
             'platforms': {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu2204:1',
-                    'packages': ['clang-15',  'libstdc++-10-dev'],
-                    'llvm_os': 'jammy',
-                    'llvm_ver': '15',
+                    'packages': ['clang-15'],
                 },
-                ('freebsd', 'x86_64'): {
-                    'os_version': '13.1',
-                },
+                ('freebsd', 'x86_64'): {'os_version': '13.1'},
             },
         },
         '14': {
@@ -701,19 +688,13 @@ _supported_compilers = {
             'platforms': {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu2204:1',
-                    'packages': ['clang-14', 'libstdc++-10-dev'],
-                    'llvm_os': 'jammy',
-                    'llvm_ver': "14",
-                },
-                ('freebsd', 'x86_64'): {
-                    'os_version': '13.1',
+                    'packages': ['clang-14'],
                 },
                 ('linux', 's390x'): {
                     'image': 'cppalliance/droneubuntu2204:multiarch',
-                    'packages': ['clang-14', 'libstdc++-10-dev'],
-                    'llvm_os': 'jammy',
-                    'llvm_ver': "14",
+                    'packages': ['clang-14'],
                 },
+                ('freebsd', 'x86_64'): {'os_version': '13.1'},
             },
         },
         '13': {
@@ -721,13 +702,9 @@ _supported_compilers = {
             'platforms': {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu2204:1',
-                    'packages': ['clang-13', 'libstdc++-10-dev'],
-                    'llvm_os': 'jammy',
-                    'llvm_ver': '13',
+                    'packages': ['clang-13'],
                 },
-                ('freebsd', 'x86_64'): {
-                    'os_version': '13.1',
-                },
+                ('freebsd', 'x86_64'): {'os_version': '13.1'},
             },
         },
         '12': {
@@ -735,34 +712,24 @@ _supported_compilers = {
             'custom_cpp': { 2023: '2b' },
             'platforms': {
                 ('linux', 'x86_64'): {
-                    'image': 'cppalliance/droneubuntu2204:1',
-                    'packages': ['clang-12', 'libstdc++-9-dev'],
-                    'llvm_os': 'focal',
-                    'llvm_ver': '12',
-                },
-                ('freebsd', 'x86_64'): {
-                    'os_version': '13.1',
+                    'image': 'cppalliance/droneubuntu2004:1',
+                    'packages': ['clang-12'],
                 },
                 ('linux', 'arm64'): {
                     'image': 'cppalliance/droneubuntu2004:multiarch',
-                    'packages': ['clang-12', 'libstdc++-9-dev'],
-                    'llvm_os': 'focal',
-                    'llvm_ver': '12',
+                    'packages': ['clang-12'],
                 },
+                ('freebsd', 'x86_64'): {'os_version': '13.1'},
             },
         },
         '11': {
             'latest_cpp':  2020,
             'platforms': {
                 ('linux', 'x86_64'): {
-                    'image': 'cppalliance/droneubuntu2204:1',
-                    'packages': ['clang-11', 'libstdc++-9-dev'],
-                    'llvm_os': 'bionic',
-                    'llvm_ver': '11',
+                    'image': 'cppalliance/droneubuntu2004:1',
+                    'packages': ['clang-11'],
                 },
-                ('freebsd', 'x86_64'): {
-                    'os_version': '13.1',
-                },
+                ('freebsd', 'x86_64'): {'os_version': '13.1'},
             },
         },
         '10': {
@@ -770,13 +737,9 @@ _supported_compilers = {
             'platforms': {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu1804:1',
-                    'packages': ['clang-10', 'libstdc++-9-dev'],
-                    'llvm_os': 'bionic',
-                    'llvm_ver': '10',
+                    'packages': ['clang-10'],
                 },
-                ('freebsd', 'x86_64'): {
-                    'os_version': '13.1',
-                },
+                ('freebsd', 'x86_64'): {'os_version': '13.1'},
             },
         },
         '9': {
@@ -785,9 +748,7 @@ _supported_compilers = {
             'platforms': {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu1804:1',
-                    'packages': ['clang-9', 'libstdc++-9-dev'],
-                    'llvm_os': 'bionic',
-                    'llvm_ver': '9',
+                    'packages': ['clang-9'],
                 },
             },
         },
@@ -797,9 +758,7 @@ _supported_compilers = {
             'platforms': {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu1804:1',
-                    'packages': ['clang-8', 'libstdc++-8-dev'],
-                    'llvm_os': 'bionic',
-                    'llvm_ver': '8',
+                    'packages': ['clang-8'],
                 },
             },
         },
@@ -809,9 +768,7 @@ _supported_compilers = {
             'platforms': {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu1804:1',
-                    'packages': ['clang-7', 'libstdc++-8-dev'],
-                    'llvm_os': 'bionic',
-                    'llvm_ver': '7',
+                    'packages': ['clang-7'],
                 },
             },
         },
@@ -821,9 +778,7 @@ _supported_compilers = {
             'platforms': {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu1804:1',
-                    'packages': ['clang-6.0', 'libc6-dbg', 'libstdc++-8-dev'],
-                    'llvm_os': 'bionic',
-                    'llvm_ver': '6.0',
+                    'packages': ['clang-6.0'],
                 },
             },
         },
@@ -831,9 +786,8 @@ _supported_compilers = {
             'latest_cpp':  2014,
             'platforms': {
                 ('linux', 'x86_64'): {
-                    'image': 'cppalliance/droneubuntu1804:1',
+                    'image': 'cppalliance/droneubuntu1604:1',
                     'packages': ['clang-5.0'],
-                    'environment': {'UBUNTU_TOOLCHAIN_DISABLE': 'true'}
                 },
             },
         },
@@ -841,10 +795,8 @@ _supported_compilers = {
             'latest_cpp':  2014,
             'platforms': {
                 ('linux', 'x86_64'): {
-                    'image': 'cppalliance/droneubuntu1804:1',
-                    'packages': ['clang-4.0', 'libstdc++-6-dev'],
-                    'llvm_os': 'xenial',
-                    'llvm_ver': '4.0',
+                    'image': 'cppalliance/droneubuntu1604:1',
+                    'packages': ['clang-4.0'],
                 },
             },
         },
@@ -853,9 +805,7 @@ _supported_compilers = {
             'platforms': {
                 ('linux', 'x86_64'): {
                     'image': 'cppalliance/droneubuntu1604:1',
-                    'packages': ['clang-3.8', 'g++'],
-                    'llvm_os': 'xenial',
-                    'llvm_ver': '3.8',
+                    'packages': ['clang-3.8'],
                 },
             },
         },
