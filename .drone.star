@@ -366,13 +366,15 @@ def apply_special(job, special):
         job['privileged'] = True
         job['environment']['DRONE_EXTRA_PRIVILEGED'] = 'True'
 
+    elif special == 'tsan':
+        job['name'] = 'TSan ' + job['name']
+        job['privileged'] = True
+        job['environment']['DRONE_EXTRA_PRIVILEGED'] = 'True'
+
     elif special == 'ubsan':
         job['name'] = 'UBSan ' + job['name']
         if job['compiler'] == 'gcc':
             set_or_append(job['environment'], 'B2_LINKFLAGS', '-fuse-ld=gold')
-
-    elif special == 'tsan':
-        job['name'] = 'TSan ' + job['name']
 
     elif special == 'valgrind':
         job['name'] = 'Valgrind ' + job['name']
