@@ -114,6 +114,9 @@ def main(ctx):
             { 'match': {'compiler': 'clang =latest', 'os': 'linux'},
               'special': 'valgrind',
             },
+            { 'match': {'compiler': 'gcc =latest', 'os': 'linux'},
+              'special': 'valgrind',
+            },
         ],
     ) + [
         linux_cxx("docs", "g++", buildtype="docs", buildscript="drone", image="cppalliance/boost_superproject_build:24.04-v3", environment={'COMMENT': 'docs'}, globalenv=globalenv),
@@ -383,24 +386,24 @@ def apply_special(job, special):
 
     elif special == 'valgrind':
         job['name'] = 'Valgrind ' + job['name']
-        job['type'] = 'valgrind'
         set_or_append(
             job['environment'], 'B2_TESTFLAGS', 'testing.launcher=valgrind',
         )
         job['environment']['VALGRIND_OPTS'] = '--error-exitcode=1'
+        job.setdefault('packages', []).append('valgrind')
 
         if job['compiler'] == 'clang' and job['os'] == 'linux':
-            job.setdefault('packages', []).append('libc6-dbg')
+            job['packages'].append('libc6-dbg')
 
     if special in ('asan', 'tsan', 'ubsan'):
         job['environment']['B2_' + special.upper()] = '1'
+        job['environment']['B2_VARIANT'] = 'debug'
 
         if job['compiler'] == 'clang' and job['os'] == 'linux':
             job.setdefault('packages', []).append(
                 'libclang-rt-%s-dev' % job['version']
             )
     if special in ('asan', 'tsan', 'ubsan', 'valgrind'):
-        job['environment']['B2_VARIANT'] = 'debug'
         job['environment']['COMMENT'] = special
         set_or_append(
             job['environment'], 'B2_DEFINES', 'BOOST_NO_STRESS_TEST=1',
