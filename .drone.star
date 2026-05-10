@@ -45,6 +45,10 @@ def main(ctx):
             },
         ],
         extras=[
+            { 'match': {'compiler': 'gcc =latest', 'os': 'linux'},
+              'name': 'GCC static linking',
+              'environment': {'B2_LINK': 'static'},
+            },
             { 'match': {'compiler': 'gcc =8', 'os': 'linux'},
               'name': 'GCC 8 CMake superproject',
               'type': 'cmake-superproject',
