@@ -212,35 +212,31 @@ value_to_impl(
     value const& jv,
     Ctx const& ctx )
 {
-    object const* obj = jv.if_object();
-    if( !obj )
+    return jv.try_as_object() & [&](object const& jo)
+        -> system::result<T>
     {
-        system::error_code ec;
-        BOOST_JSON_FAIL(ec, error::not_object);
-        return {boost::system::in_place_error, ec};
-    }
+        T res;
+        error const e = detail::try_reserve(
+            res, jo.size(), reserve_implementation<T>());
+        if( e != error() )
+        {
+            system::error_code ec;
+            BOOST_JSON_FAIL( ec, e );
+            return {boost::system::in_place_error, ec};
+        }
 
-    T res;
-    error const e = detail::try_reserve(
-        res, obj->size(), reserve_implementation<T>());
-    if( e != error() )
-    {
-        system::error_code ec;
-        BOOST_JSON_FAIL( ec, e );
-        return {boost::system::in_place_error, ec};
-    }
-
-    auto ins = detail::inserter(res, inserter_implementation<T>());
-    for( key_value_pair const& kv: *obj )
-    {
-        auto elem_res = try_value_to<mapped_type<T>>( kv.value(), ctx );
-        if( elem_res.has_error() )
-            return {boost::system::in_place_error, elem_res.error()};
-        *ins++ = value_type<T>{
-            key_type<T>(kv.key()),
-            std::move(elem_res.unsafe_value())};
-    }
-    return res;
+        auto ins = detail::inserter(res, inserter_implementation<T>());
+        for(key_value_pair const& kv: jo)
+        {
+            auto elem_res = try_value_to<mapped_type<T>>( kv.value(), ctx );
+            if( elem_res.has_error() )
+                return {boost::system::in_place_error, elem_res.error()};
+            *ins++ = value_type<T>{
+                key_type<T>(kv.key()),
+                std::move(elem_res.unsafe_value())};
+        }
+        return res;
+    };
 }
 
 // all other containers
