@@ -635,10 +635,7 @@ mp11::mp_if_c< !mp11::mp_valid<has_user_conversion_to_impl, T>::value, T>
 value_to_impl(
     user_conversion_tag, value_to_tag<T>, value const& jv, Ctx const& )
 {
-    auto res = tag_invoke(try_value_to_tag<T>(), jv);
-    if( res.has_error() )
-        throw_system_error( res.error() );
-    return std::move(res.unsafe_value());
+    return tag_invoke(try_value_to_tag<T>(), jv).value();
 }
 
 template<
@@ -653,10 +650,7 @@ mp11::mp_if_c<
 value_to_impl(
     context_conversion_tag, value_to_tag<T>, value const& jv, Ctx const& ctx )
 {
-    auto res = tag_invoke( try_value_to_tag<T>(), jv, Sup::get(ctx) );
-    if( res.has_error() )
-        throw_system_error( res.error() );
-    return std::move(res.unsafe_value());
+    return tag_invoke( try_value_to_tag<T>(), jv, Sup::get(ctx) ).value();
 }
 
 template<
@@ -674,10 +668,7 @@ value_to_impl(
     value const& jv,
     Ctx const& ctx )
 {
-    auto res = tag_invoke(try_value_to_tag<T>(), jv, Sup::get(ctx), ctx);
-    if( res.has_error() )
-        throw_system_error( res.error() );
-    return std::move(res.unsafe_value());
+    return tag_invoke(try_value_to_tag<T>(), jv, Sup::get(ctx), ctx).value();
 }
 
 //----------------------------------------------------------
