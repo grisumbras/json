@@ -88,10 +88,9 @@ class storage_ptr
     shared_resource*
     get_shared() const noexcept
     {
-        auto const i = reinterpret_cast<std::uintptr_t>(p_);
-        auto const c_ptr = reinterpret_cast<unsigned char*>(p_) - (i & 3);
+        auto const i = reinterpret_cast<std::uintptr_t>(p_) & ~3;
         return static_cast<shared_resource*>(
-            reinterpret_cast<container::pmr::memory_resource*>(c_ptr));
+            reinterpret_cast<container::pmr::memory_resource*>(i));
     }
 
     void
@@ -117,9 +116,10 @@ class storage_ptr
     template<class T>
     storage_ptr(
         detail::shared_resource_impl<T>* p) noexcept
-        : p_(reinterpret_cast<unsigned char*>(
-                static_cast<container::pmr::memory_resource*>(p))
-             + 1 + (json::is_deallocate_trivial<T>::value ? 2 : 0))
+        : p_(reinterpret_cast<void*>(
+                reinterpret_cast<std::uintptr_t>(
+                    static_cast<container::pmr::memory_resource*>(p))
+             + 1 + (json::is_deallocate_trivial<T>::value ? 2 : 0)))
     {
         BOOST_ASSERT(p);
     }
@@ -202,9 +202,10 @@ public:
 #endif
     >
     storage_ptr(T* r) noexcept
-        : p_(reinterpret_cast<unsigned char*>(
-                static_cast<container::pmr::memory_resource*>(r))
-             + (json::is_deallocate_trivial<T>::value ? 2 : 0))
+        : p_(reinterpret_cast<void*>(
+                reinterpret_cast<std::uintptr_t>(
+                    static_cast<container::pmr::memory_resource*>(r))
+            + (json::is_deallocate_trivial<T>::value ? 2 : 0)))
     {
         BOOST_ASSERT(r);
     }
@@ -300,7 +301,7 @@ public:
     bool
     is_shared() const noexcept
     {
-        auto i = reinterpret_cast<std::uintptr_t>(p_);
+        auto const i = reinterpret_cast<std::uintptr_t>(p_);
         return (i & 1) != 0;
     }
 
@@ -314,7 +315,7 @@ public:
     bool
     is_deallocate_trivial() const noexcept
     {
-        auto i = reinterpret_cast<std::uintptr_t>(p_);
+        auto const i = reinterpret_cast<std::uintptr_t>(p_);
         return (i & 2) != 0;
     }
 
@@ -327,7 +328,7 @@ public:
     bool
     is_not_shared_and_deallocate_is_trivial() const noexcept
     {
-        auto i = reinterpret_cast<std::uintptr_t>(p_);
+        auto const i = reinterpret_cast<std::uintptr_t>(p_);
         return (i & 3) == 2;
     }
 
@@ -345,12 +346,12 @@ public:
     container::pmr::memory_resource*
     get() const noexcept
     {
-        if(!p_)
-            return default_resource::get();
-
-        auto const i = reinterpret_cast<std::uintptr_t>(p_);
-        auto const c_ptr = reinterpret_cast<unsigned char*>(p_) - (i & 3);
-        return reinterpret_cast<container::pmr::memory_resource*>(c_ptr);
+        if(p_)
+        {
+            auto const i = reinterpret_cast<std::uintptr_t>(p_) & ~3;
+            return reinterpret_cast<container::pmr::memory_resource*>(i);
+        }
+        return default_resource::get();
     }
 
     /** Return a pointer to the memory resource.
