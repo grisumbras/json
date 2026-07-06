@@ -395,6 +395,7 @@ replace_unchecked(
         detail::throw_system_error( error::out_of_range, &loc );
     }
     const auto curr_data = data();
+    n1 = (std::min)(n1, curr_size - pos);
     const auto delta = (std::max)(n1, n2) -
         (std::min)(n1, n2);
     // if the size doesn't change, we don't need to

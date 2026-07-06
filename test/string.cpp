@@ -2419,6 +2419,34 @@ public:
                            s1.replace(0, 1, 1, 'a'));
             });
 
+            // count exceeds size() - pos: clamped to size() - pos (sbo)
+            fail_loop([&](storage_ptr const& sp)
+            {
+                std::string s1(t.v1.data(), t.v1.size());
+                string s2(t.v1, sp);
+                BOOST_TEST(s2.replace(1, s2.size() + 100, 3, 'a') ==
+                           s1.replace(1, s1.size() + 100, 3, 'a'));
+            });
+
+            // count exceeds size() - pos: erase from pos to end
+            fail_loop([&](storage_ptr const& sp)
+            {
+                std::string s1(t.v2.data(), t.v2.size());
+                string s2(t.v2, sp);
+                BOOST_TEST(s2.replace(0, s2.size() + 100, 0, 'a') ==
+                           s1.replace(0, s1.size() + 100, 0, 'a'));
+            });
+
+            // count exceeds size() - pos, with growth and realloc
+            fail_loop([&](storage_ptr const& sp)
+            {
+                std::string s1(t.v2.data(), t.v2.size());
+                string s2(t.v2, sp);
+                const auto grow = (std::max)(s1.capacity(), s2.capacity()) + 1;
+                BOOST_TEST(s2.replace(2, s2.size() + 100, grow, 'a') ==
+                           s1.replace(2, s1.size() + 100, grow, 'a'));
+            });
+
             // pos out of range
             fail_loop([&](storage_ptr const& sp)
             {
