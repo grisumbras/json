@@ -2079,6 +2079,21 @@ public:
                 BOOST_TEST(s == cs);
             });
         }
+
+        // self-append via the iterator overload forcing reallocation
+        {
+            fail_loop([&](storage_ptr const& sp)
+            {
+                string s(sp);
+                s.append(t.v2);
+                while(s.size() < s.capacity())
+                    s.push_back('*');
+                std::string const cs(s.data(), s.size());
+                auto const sv = s.subview(3);
+                s.append(sv.begin(), sv.end());
+                BOOST_TEST(s == cs + cs.substr(3));
+            });
+        }
     }
 
     void
