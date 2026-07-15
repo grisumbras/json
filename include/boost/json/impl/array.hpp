@@ -565,7 +565,7 @@ insert(
     revert_insert r(pos, n, *this);
     while(n--)
     {
-        ::new(r.p) value(*first++);
+        ::new(r.p) value(*first++, sp_);
         ++r.p;
     }
     return r.commit();

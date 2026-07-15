@@ -971,7 +971,7 @@ public:
                 array a({str_}, sp);
                 a.insert(a.begin(),
                     init.begin(), init.end());
-                check(a);
+                check(a, sp);
             });
 
             // random iterator (multiple growth)
@@ -1008,7 +1008,7 @@ public:
                 a.insert(a.begin(),
                     make_input_iterator(init.begin()),
                     make_input_iterator(init.end()));
-                check(a);
+                check(a, sp);
             });
 
             // input iterator (multiple growth)
