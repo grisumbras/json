@@ -561,7 +561,7 @@ public:
 
     constexpr
     bool
-    is_seamless() noexcept
+    is_seamless() const noexcept
     {
         return impl_.is_seamless();
     }
