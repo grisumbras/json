@@ -838,7 +838,17 @@ public:
                 s.assign(t.s2.c_str(), 3);
                 BOOST_TEST(s == "ABC");
             });
-        };
+
+            // non-SBO: assign from a substring of itself
+            fail_loop([&](storage_ptr const& sp)
+            {
+                string s("abcdefghijklmnopqrstuvwxyz0123456789", sp);
+                string_view sub(s.data() + 3, s.size() - 3);
+                std::string expected(sub.data(), sub.size());
+                s.assign(sub);
+                BOOST_TEST(s == expected);
+            });
+        }
 
         // assign(char const* s)
         {
