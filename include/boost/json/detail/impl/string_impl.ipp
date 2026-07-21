@@ -435,9 +435,9 @@ shrink_to_fit(
     auto const t = p_.t;
     if(t->size <= sbo_chars_)
     {
-        s_.k = short_string_;
         std::memcpy(
             s_.buf, data(), t->size);
+        s_.k = short_string_;
         s_.buf[sbo_chars_] =
             static_cast<char>(
                 sbo_chars_ - t->size);
@@ -458,7 +458,7 @@ shrink_to_fit(
         std::memcpy(
             tmp.data(),
             data(),
-            size());
+            size() + 1);
         destroy(sp);
         *this = tmp;
 #ifndef BOOST_NO_EXCEPTIONS

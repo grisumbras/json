@@ -1367,6 +1367,24 @@ public:
 
             s.shrink_to_fit();
             BOOST_TEST(s.capacity() < cap);
+
+            std::string const copy( s.begin(), s.end() );
+
+            std::size_t const sbo_capacity = string{}.capacity();
+            std::size_t n = sbo_capacity + 1;
+            BOOST_ASSERT(s.capacity() > n);
+            s.resize(n);
+            s.shrink_to_fit();
+            BOOST_TEST(s.size() == n);
+            BOOST_TEST(s == string_view(copy.data(), n));
+            BOOST_TEST(s.data()[s.size()] == '\0');
+
+            n = sbo_capacity - 1;
+            s.resize(n);
+            s.shrink_to_fit();
+            BOOST_TEST(s.size() == n);
+            BOOST_TEST(s.capacity() == sbo_capacity);
+            BOOST_TEST(s == string_view(copy.data(), n));
         });
     }
 
