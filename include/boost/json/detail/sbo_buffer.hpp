@@ -141,9 +141,6 @@ public:
     void
     grow( std::size_t size )
     {
-        if( !size )
-            return;
-
         if( max_size() - size_ < size )
         {
             BOOST_STATIC_CONSTEXPR source_location loc = BOOST_CURRENT_LOCATION;
@@ -152,6 +149,8 @@ public:
 
         std::size_t const old_capacity = this->capacity();
         std::size_t new_capacity = size_ + size;
+        if( new_capacity <= old_capacity )
+            return;
 
         // growth factor 2
         if( old_capacity <= max_size() - old_capacity ) // check for overflow
