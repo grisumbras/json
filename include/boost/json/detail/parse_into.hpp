@@ -18,6 +18,7 @@
 #include <boost/json/value.hpp>
 #include <boost/describe/enum_from_string.hpp>
 
+#include <bitset>
 #include <vector>
 
 /*
@@ -1152,7 +1153,7 @@ private:
 
     handler_tuple<converting_handler, InnerHandlers> handlers_;
     int inner_active_ = -1;
-    std::size_t activated_ = 0;
+    std::bitset<mp11::mp_size<Dt>::value> seen_;
 
 public:
     converting_handler( converting_handler const& ) = delete;
@@ -1184,7 +1185,7 @@ public:
             inner_active_,
             is_required_checker{});
         if( required_member )
-            ++activated_;
+            seen_[inner_active_] = true;
 
         key_ = {};
         inner_active_ = -1;
@@ -1214,7 +1215,10 @@ public:
     bool on_object_begin( system::error_code& ec )
     {
         if( inner_active_ < 0 )
+        {
+            seen_.reset();
             return true;
+        }
 
         BOOST_JSON_INVOKE_INNER( on_object_begin(ec) );
     }
@@ -1225,7 +1229,7 @@ public:
         {
             using C = mp11::mp_count_if<Dt, is_optional_like>;
             constexpr int N = mp11::mp_size<Dt>::value - C::value;
-            if( activated_ < N )
+            if( seen_.count() < N )
             {
                 BOOST_JSON_FAIL( ec, error::size_mismatch );
                 return false;
