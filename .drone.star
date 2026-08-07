@@ -609,6 +609,7 @@ _supported_compilers = {
                     'image': 'cppalliance/droneubuntu2404:1',
                     'packages': ['clang-23'],
                     'llvm_os': 'noble',
+                    'llvm_ver': '23',
                 },
             },
         },
