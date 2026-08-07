@@ -1124,7 +1124,6 @@ check_array_impl(
 } // detail
 
 template<class... Argn>
-static
 void
 check_array(
     value const& jv,

@@ -8,8 +8,18 @@
 //
 
 #include <boost/json.hpp>
-#include <boost/container/pmr/vector.hpp>
 #include <iostream>
+
+#if defined(BOOST_CLANG) && BOOST_CLANG_VERSION > 40000
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wunused-template"
+#endif
+
+#include <boost/container/pmr/vector.hpp>
+
+#if defined(BOOST_CLANG) && BOOST_CLANG_VERSION > 40000
+# pragma clang diagnostic pop
+#endif
 
 #include "test_suite.hpp"
 

@@ -14,9 +14,19 @@
 */
 
 #include <boost/container/pmr/monotonic_buffer_resource.hpp>
-#include <boost/container/pmr/vector.hpp>
 #include <boost/json.hpp>
 #include <boost/system/errc.hpp>
+
+#if defined(BOOST_CLANG) && BOOST_CLANG_VERSION > 40000
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wunused-template"
+#endif
+
+#include <boost/container/pmr/vector.hpp>
+
+#if defined(BOOST_CLANG) && BOOST_CLANG_VERSION > 40000
+# pragma clang diagnostic pop
+#endif
 
 using namespace boost::json;
 using namespace boost::container;
