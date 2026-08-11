@@ -18,6 +18,7 @@
 #include <boost/core/max_align.hpp>
 #include <iostream>
 
+#include "checking_resource.hpp"
 #include "test_suite.hpp"
 
 namespace boost {
@@ -306,11 +307,23 @@ R"xx({
     }
 
     void
+    testAllocation()
+    {
+        // every block obtained from the upstream resource has to be
+        // returned to it with the size it was allocated with
+        BOOST_TEST_CHECKPOINT();
+        checking_resource res;
+        monotonic_resource mr(1, &res);
+        (void)mr.allocate(1, alignof(core::max_align_t));
+    }
+
+    void
     run()
     {
         testMembers();
         testStorage();
         testGeneral();
+        testAllocation();
     }
 };
 

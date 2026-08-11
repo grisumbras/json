@@ -103,7 +103,7 @@ release() noexcept
     while(p != &buffer_)
     {
         auto next = p->next;
-        upstream_->deallocate(p, p->size);
+        upstream_->deallocate(p, sizeof(block) + p->size);
         p = next;
     }
     buffer_.p = reinterpret_cast<
