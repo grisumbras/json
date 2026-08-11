@@ -320,6 +320,38 @@ public:
             BOOST_TEST(ec.has_location());
         }
 
+        // overflow on the str8 resume path; the multi-byte character is
+        // split across writes so that it completes on that path
+        {
+            stream_parser p;
+            system::error_code ec;
+            std::string const big(string::max_size(), '*');
+            p.write_some("\"", 1, ec);
+            BOOST_TEST(! ec);
+            p.write_some(big.data(), big.size(), ec);
+            BOOST_TEST(! ec);
+            p.write_some("\xC3", 1, ec);
+            BOOST_TEST(! ec);
+            p.write_some("\xA9", 1, ec);
+            BOOST_TEST(ec == error::string_too_large);
+            BOOST_TEST(ec.has_location());
+        }
+
+        // likewise for a key
+        {
+            stream_parser p;
+            system::error_code ec;
+            std::string const big(string::max_size(), '*');
+            p.write_some("{\"", 2, ec);
+            BOOST_TEST(! ec);
+            p.write_some(big.data(), big.size(), ec);
+            BOOST_TEST(! ec);
+            p.write_some("\xC3", 1, ec);
+            BOOST_TEST(! ec);
+            p.write_some("\xA9", 1, ec);
+            BOOST_TEST(ec == error::key_too_large);
+            BOOST_TEST(ec.has_location());
+        }
 
         // object overflow
         {
