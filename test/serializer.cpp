@@ -702,7 +702,9 @@ public:
         BOOST_TEST( !st.empty() );
 
         st.push(sample);
-        st.push(3.4);
+
+        double const sample_double = 3.4;
+        st.push(sample_double);
 
         std::vector<int> v{1, 2, 3, 4, 5};
         st.push(v);
@@ -736,8 +738,7 @@ public:
         {
             double d1;
             st.peek( d1 );
-            BOOST_TEST( d1 == 3.4 );
-
+            BOOST_TEST( d1 == sample_double );
             double d2;
             st.pop( d2 );
             BOOST_TEST( d2 == d1 );

@@ -437,7 +437,11 @@ public:
             char buffer[ 128 ];
             sprintf( buffer, "1e%d", i );
 
-            checkAccuracy( buffer, 0 );
+            int max_ulp = 0;
+#if BOOST_JSON_ARCH == 32
+            max_ulp = 1; // we may be more precise than strtod for 32 bits
+#endif // BOOST_JSON_ARCH == 32
+            checkAccuracy( buffer, max_ulp );
         }
     }
 
@@ -461,94 +465,50 @@ public:
 
         // test cases from https://www.icir.org/vern/papers/testbase-report.pdf
         // (A Program for Testing IEEE Decimal–Binary Conversion by Vern Paxson)
-        BOOST_TEST(
-            parse("5e125", {}, opts) == 5e125 );
-        BOOST_TEST(
-            parse("69e267", {}, opts) == 69e267 );
-        BOOST_TEST(
-            parse("999e-026", {}, opts) == 999e-026 );
-        BOOST_TEST(
-            parse("7861e-034", {}, opts) == 7861e-034 );
-        BOOST_TEST(
-            parse("75569e-254", {}, opts) == 75569e-254 );
-        BOOST_TEST(
-            parse("928609e-261", {}, opts) == 928609e-261 );
-        BOOST_TEST(
-            parse("9210917e080", {}, opts) == 9210917e080 );
-        BOOST_TEST(
-            parse("84863171e114", {}, opts) == 84863171e114 );
-        BOOST_TEST(
-            parse("653777767e273", {}, opts) == 653777767e273 );
-        BOOST_TEST(
-            parse("5232604057e-298", {}, opts) == 5232604057e-298 );
-        BOOST_TEST(
-            parse("27235667517e-109", {}, opts) == 27235667517e-109 );
-        BOOST_TEST(
-            parse("653532977297e-123", {}, opts) == 653532977297e-123 );
-        BOOST_TEST(
-            parse("3142213164987e-294", {}, opts) == 3142213164987e-294 );
-        BOOST_TEST(
-            parse("46202199371337e-072", {}, opts) == 46202199371337e-072 );
-        BOOST_TEST(
-            parse("231010996856685e-073", {}, opts) == 231010996856685e-073 );
-        BOOST_TEST(
-            parse("9324754620109615e212", {}, opts) == 9324754620109615e212 );
-        BOOST_TEST(
-            parse("78459735791271921e049", {}, opts) == 78459735791271921e049 );
-        BOOST_TEST(
-            parse("272104041512242479e200", {}, opts) == 272104041512242479e200 );
-        BOOST_TEST(
-            parse("6802601037806061975e198", {}, opts) == 6802601037806061975e198 );
-        BOOST_TEST(
-            parse("20505426358836677347e-221", {}, opts) == 20505426358836677347e-221 );
-        BOOST_TEST(
-            parse("836168422905420598437e-234", {}, opts) == 836168422905420598437e-234 );
-        BOOST_TEST(
-            parse("4891559871276714924261e222", {}, opts) == 4891559871276714924261e222 );
-        BOOST_TEST(
-            parse("9e-265", {}, opts) == 9e-265 );
-        BOOST_TEST(
-            parse("85e-037", {}, opts) == 85e-037 );
-        BOOST_TEST(
-            parse("623e100", {}, opts) == 623e100 );
-        BOOST_TEST(
-            parse("3571e263", {}, opts) == 3571e263 );
-        BOOST_TEST(
-            parse("81661e153", {}, opts) == 81661e153 );
-        BOOST_TEST(
-            parse("920657e-023", {}, opts) == 920657e-023 );
-        BOOST_TEST(
-            parse("4603285e-024", {}, opts) == 4603285e-024 );
-        BOOST_TEST(
-            parse("87575437e-309", {}, opts) == 87575437e-309 );
-        BOOST_TEST(
-            parse("245540327e122", {}, opts) == 245540327e122 );
-        BOOST_TEST(
-            parse("6138508175e120", {}, opts) == 6138508175e120 );
-        BOOST_TEST(
-            parse("83356057653e193", {}, opts) == 83356057653e193 );
-        BOOST_TEST(
-            parse("619534293513e124", {}, opts) == 619534293513e124 );
-        BOOST_TEST(
-            parse("2335141086879e218", {}, opts) == 2335141086879e218 );
-        BOOST_TEST(
-            parse("36167929443327e-159", {}, opts) == 36167929443327e-159 );
-        BOOST_TEST(
-            parse("609610927149051e-255", {}, opts) == 609610927149051e-255 );
-        BOOST_TEST(
-            parse("3743626360493413e-165", {}, opts) == 3743626360493413e-165 );
-        BOOST_TEST(
-            parse("94080055902682397e-242", {}, opts) == 94080055902682397e-242 );
-        BOOST_TEST(
-            parse("899810892172646163e283", {}, opts) == 899810892172646163e283 );
-        BOOST_TEST(
-            parse("7120190517612959703e120", {}, opts) == 7120190517612959703e120 );
-        BOOST_TEST(
-            parse("25188282901709339043e-252", {}, opts) == 25188282901709339043e-252 );
-        BOOST_TEST(
-            parse("308984926168550152811e-052", {}, opts) == 308984926168550152811e-052 );
-        BOOST_TEST(
-            parse("6372891218502368041059e064", {}, opts) == 6372891218502368041059e064 );
+        checkAccuracy("5e125", 0, opts);
+        checkAccuracy("69e267", 0, opts);
+        checkAccuracy("999e-026", 0, opts);
+        checkAccuracy("7861e-034", 0, opts);
+        checkAccuracy("75569e-254", 0, opts);
+        checkAccuracy("928609e-261", 0, opts);
+        checkAccuracy("9210917e080", 0, opts);
+        checkAccuracy("84863171e114", 0, opts);
+        checkAccuracy("653777767e273", 0, opts);
+        checkAccuracy("5232604057e-298", 0, opts);
+        checkAccuracy("27235667517e-109", 0, opts);
+        checkAccuracy("653532977297e-123", 0, opts);
+        checkAccuracy("3142213164987e-294", 0, opts);
+        checkAccuracy("46202199371337e-072", 0, opts);
+        checkAccuracy("231010996856685e-073", 0, opts);
+        checkAccuracy("9324754620109615e212", 0, opts);
+        checkAccuracy("78459735791271921e049", 0, opts);
+        checkAccuracy("272104041512242479e200", 0, opts);
+        checkAccuracy("6802601037806061975e198", 0, opts);
+        checkAccuracy("20505426358836677347e-221", 0, opts);
+        checkAccuracy("836168422905420598437e-234", 0, opts);
+        checkAccuracy("4891559871276714924261e222", 0, opts);
+        checkAccuracy("9e-265", 0, opts);
+        checkAccuracy("85e-037", 0, opts);
+        checkAccuracy("623e100", 0, opts);
+        checkAccuracy("3571e263", 0, opts);
+        checkAccuracy("81661e153", 0, opts);
+        checkAccuracy("920657e-023", 0, opts);
+        checkAccuracy("4603285e-024", 0, opts);
+        checkAccuracy("87575437e-309", 0, opts);
+        checkAccuracy("245540327e122", 0, opts);
+        checkAccuracy("6138508175e120", 0, opts);
+        checkAccuracy("83356057653e193", 0, opts);
+        checkAccuracy("619534293513e124", 0, opts);
+        checkAccuracy("2335141086879e218", 0, opts);
+        checkAccuracy("36167929443327e-159", 0, opts);
+        checkAccuracy("609610927149051e-255", 0, opts);
+        checkAccuracy("3743626360493413e-165", 0, opts);
+        checkAccuracy("94080055902682397e-242", 0, opts);
+        checkAccuracy("899810892172646163e283", 0, opts);
+        checkAccuracy("7120190517612959703e120", 0, opts);
+        checkAccuracy("25188282901709339043e-252", 0, opts);
+        checkAccuracy("308984926168550152811e-052", 0, opts);
+        checkAccuracy("6372891218502368041059e064", 0, opts);
     }
 
     void
