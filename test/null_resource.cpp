@@ -28,8 +28,15 @@ public:
             mr.allocate(16),
             std::bad_alloc);
         char buf[128];
+#if defined(BOOST_GCC) && BOOST_GCC >= 160000
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wfree-nonheap-object"
+#endif
         // no-op
         mr.deallocate(&buf[0], 128);
+#if defined(BOOST_GCC) && BOOST_GCC >= 160000
+# pragma GCC diagnostic pop
+#endif
         BOOST_TEST(
             mr == *get_null_resource());
     }
